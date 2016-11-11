@@ -3,7 +3,7 @@
 ## Author: Renew
 ## X-Website: https://github.com/Voidmenull
 ## Notes: A simple poison helper for rogues.
-## Version: 1.0
+## Version: 1.1
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
 ## SavedVariablesPerCharacter: EZPcfg

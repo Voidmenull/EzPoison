@@ -4,6 +4,7 @@ EZP.Parser = CreateFrame("GameTooltip", "EZPParser", nil, "GameTooltipTemplate")
 EZP.ACE = AceLibrary("AceAddon-2.0"):new("FuBarPlugin-2.0")
 EZP:RegisterEvent("ADDON_LOADED")
 EZP:RegisterEvent("UNIT_INVENTORY_CHANGED")
+EZP:RegisterEvent("BAG_UPDATE")
 
 --fubar/mapicon
 EZP.ACE.name = "EzPoison"
@@ -54,7 +55,12 @@ EZP.Work = 	{
 EZP.GetWeaponEnchantInfo = GetWeaponEnchantInfo
 
 function EZP:OnEvent()
-	if event == "ADDON_LOADED" and arg1 == "EzPoison" then
+	if event == "BAG_UPDATE" then
+		if arg1 == 0 or arg1 == 1 or arg1 == 2 or arg1 == 3 or arg1 == 4 then
+			EZP:UpdatePoisonCount()
+		end
+		
+	elseif event == "ADDON_LOADED" and arg1 == "EzPoison" then
 		if not EZPcfg then
 			EZPcfg = {
 				Profile ={
@@ -72,6 +78,7 @@ function EZP:OnEvent()
 				Scale = 1,
 			}
 		end
+
 		EZP.ConfigFrame:ConfigureUI()
 		EZP:SetProfile()
 		EZP:ConfigFubar()
@@ -89,6 +96,7 @@ function EZP:OnEvent()
 		
 	elseif event == "UNIT_INVENTORY_CHANGED" then
 		EZP:UpdateTexture()
+		
 	end
 end
 
@@ -199,6 +207,12 @@ function EZP.ConfigFrame:ConfigureUI()
 	self.MainHand.Background:SetVertexColor(1, 1, 1, 0)
 	self.MainHand.Background:SetBlendMode("ADD")
 	
+	self.MainHand.Font = self.MainHand:CreateFontString(nil, "OVERLAY")
+    self.MainHand.Font:SetPoint("BOTTOMRIGHT", -3, 3)
+    self.MainHand.Font:SetFont("Fonts\\ARIALN.TTF", 10, "OUTLINE")
+	self.MainHand.Font:SetTextColor(0.8,0.8,0.8)
+    --self.MainHand.Font:SetText("999")
+
 	-- OffHand
 	local function OffHandDropDownFun()
 		local info = {}
@@ -268,7 +282,16 @@ function EZP.ConfigFrame:ConfigureUI()
 	self.OffHand.Background:SetVertexColor(1, 1, 1, 0)
 	self.OffHand.Background:SetBlendMode("ADD")
 	
-	self:Hide()
+	self.OffHand.Font = self.OffHand:CreateFontString(nil, "OVERLAY")
+    self.OffHand.Font:SetPoint("BOTTOMRIGHT", -3, 3)
+    self.OffHand.Font:SetFont("Fonts\\ARIALN.TTF", 10, "OUTLINE")
+	self.OffHand.Font:SetTextColor(0.8,0.8,0.8)
+    --self.OffHand.Font:SetText("999")
+	
+	self:SetScript("OnShow",function() EZPcfg.isVisible = 1 end)
+	self:SetScript("OnHide",function() EZPcfg.isVisible = nil end)
+	
+	if not EZPcfg.isVisible then self:Hide() end
 end
 
 function EZP:ConfigFubar()
@@ -544,6 +567,48 @@ function EZP:UpdateTexture()
 	else
 		EZP.ConfigFrame.OffHand:SetAlpha(0.2)
 	end
+	
+	EZP:UpdatePoisonCount()
+end
+
+function EZP:UpdatePoisonCount()
+	-- MainHand
+	local countPoison = 0
+	local count = 0
+	local id = EZP:GetInventoryID("MH")
+	if id then
+		local poisonName = gsub(string.lower(EZP.Work.Poison[id[5]]..id[3]),"-","")
+		for i=0,4 do 
+			for j=1,18 do
+				if GetContainerItemInfo(i, j) then
+					if string.find(poisonName,gsub(string.lower(gsub(GetContainerItemLink(i,j),"^.*%[(.*)%].*$","%1")),"-","")) then
+						_, count = GetContainerItemInfo(i, j)
+						countPoison = countPoison + count
+					end
+				end
+			end
+		end
+	end
+	EZP.ConfigFrame.MainHand.Font:SetText(countPoison)
+	
+	-- OffHand
+	countPoison = 0
+	count = 0
+	id = EZP:GetInventoryID("OH")
+	if id then
+		poisonName = gsub(string.lower(EZP.Work.Poison[id[5]]..id[3]),"-","")
+		for i=0,4 do 
+			for j=1,18 do
+				if GetContainerItemInfo(i, j) then
+					if string.find(poisonName,gsub(string.lower(gsub(GetContainerItemLink(i,j),"^.*%[(.*)%].*$","%1")),"-","")) then
+						_, count = GetContainerItemInfo(i, j)
+						countPoison = countPoison + count
+					end
+				end
+			end
+		end
+	end
+	EZP.ConfigFrame.OffHand.Font:SetText(countPoison)
 end
 
 function EZP:GetInventoryID(hand)
@@ -669,7 +734,7 @@ function EZP:SetProfile(profileNum)
 	
 	UIDropDownMenu_SetSelectedID(getglobal("EZPMainHandDD"), EZPcfg.Profile[EZPcfg.CurrentProfile].MainHand+1)
 	UIDropDownMenu_SetSelectedID(getglobal("EZPOffHandDD"), EZPcfg.Profile[EZPcfg.CurrentProfile].OffHand+1)
-	DEFAULT_CHAT_FRAME:AddMessage("EzPoison: ".."|cFFFFFFFF".."Profile: ".."|cFFCC9900"..EZPcfg.Profile[EZPcfg.CurrentProfile].Name.."|r".."|cFFFFFFFF".." set.".."|r",0.4,0.8,0.4)
+	--DEFAULT_CHAT_FRAME:AddMessage("EzPoison: ".."|cFFFFFFFF".."Profile: ".."|cFFCC9900"..EZPcfg.Profile[EZPcfg.CurrentProfile].Name.."|r".."|cFFFFFFFF".." set.".."|r",0.4,0.8,0.4)
 	
 	EZP:UpdateSelection()
 end
@@ -694,6 +759,83 @@ function EZP:UpdateSelection()
 	
 	EZP:UpdateTexture()
 end
+
+--additonal feature/ hooking temp-enchant OnUpdate function
+function EZP:BuffFrame_Enchant_OnUpdate(elapsed)
+	local hasMainHandEnchant, mainHandExpiration, mainHandCharges, hasOffHandEnchant, offHandExpiration, offHandCharges = GetWeaponEnchantInfo();
+	
+	-- No enchants, kick out early
+	if ( not hasMainHandEnchant and not hasOffHandEnchant ) then
+		TempEnchant1:Hide();
+		TempEnchant1Duration:Hide();
+		TempEnchant2:Hide();
+		TempEnchant2Duration:Hide();
+		BuffFrame:SetPoint("TOPRIGHT", "TemporaryEnchantFrame", "TOPRIGHT", 0, 0);
+		return;
+	end
+	-- Has enchants
+	local enchantButton;
+	local textureName;
+	local buffAlphaValue;
+	local enchantIndex = 0;
+	if ( hasOffHandEnchant ) then
+		enchantIndex = enchantIndex + 1;
+		textureName = GetInventoryItemTexture("player", 17);
+		TempEnchant1:SetID(17);
+		TempEnchant1Icon:SetTexture(textureName);
+		TempEnchant1:Show();
+		hasEnchant = 1;
+
+		-- Show buff durations if necessary
+		if ( offHandExpiration ) then
+			offHandExpiration = offHandExpiration/1000;
+		end
+		if offHandCharges and offHandCharges > 0 then getglobal("TempEnchant1".."Count"):SetText(offHandCharges) end
+		BuffFrame_UpdateDuration(TempEnchant1, offHandExpiration);
+
+		-- Handle flashing
+		if ( offHandExpiration and offHandExpiration < BUFF_WARNING_TIME ) then
+			TempEnchant1:SetAlpha(BUFF_ALPHA_VALUE);
+		else
+			TempEnchant1:SetAlpha(1.0);
+		end
+		
+	end
+	if ( hasMainHandEnchant ) then
+		enchantIndex = enchantIndex + 1;
+		enchantButton = getglobal("TempEnchant"..enchantIndex);
+		textureName = GetInventoryItemTexture("player", 16);
+		enchantButton:SetID(16);
+		getglobal(enchantButton:GetName().."Icon"):SetTexture(textureName);
+		enchantButton:Show();
+		hasEnchant = 1;
+
+		-- Show buff durations if necessary
+		if ( mainHandExpiration ) then
+			mainHandExpiration = mainHandExpiration/1000;
+		end
+		if mainHandCharges and mainHandCharges > 0 then getglobal("TempEnchant2".."Count"):SetText(mainHandCharges) end
+		BuffFrame_UpdateDuration(enchantButton, mainHandExpiration);
+
+		-- Handle flashing
+		if ( mainHandExpiration and mainHandExpiration < BUFF_WARNING_TIME ) then
+			enchantButton:SetAlpha(BUFF_ALPHA_VALUE);
+		else
+			enchantButton:SetAlpha(1.0);
+		end
+	end
+	--Hide unused enchants
+	for i=enchantIndex+1, 2 do
+		getglobal("TempEnchant"..i):Hide();
+		getglobal("TempEnchant"..i.."Duration"):Hide();
+	end
+
+	-- Position buff frame
+	TemporaryEnchantFrame:SetWidth(enchantIndex * 32);
+	BuffFrame:SetPoint("TOPRIGHT", "TemporaryEnchantFrame", "TOPLEFT", -5, 0);
+end
+
+BuffFrame_Enchant_OnUpdate = EZP.BuffFrame_Enchant_OnUpdate
 
 -- prompt
 function EzPoisonPromt(arg1)
