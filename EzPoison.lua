@@ -85,6 +85,7 @@ function EZP:OnEvent()
 		EZP.ConfigFrame:ConfigureUI()
 		EZP:SetProfile()
 		EZP:ConfigFubar()
+		EZP.ConfigFrame:SetScript("OnUpdate",EZP.AddonStart)
 	
 	elseif event == "SPELLCAST_START" then
 		EZP.Work.iSCasting = 1
@@ -99,7 +100,6 @@ function EZP:OnEvent()
 		
 	elseif event == "UNIT_INVENTORY_CHANGED" then
 		EZP:UpdateTexture()
-		
 	end
 end
 
@@ -304,6 +304,16 @@ function EZP.ConfigFrame:ConfigureUI()
 	self:SetScript("OnHide",function() EZPcfg.isVisible = nil end)
 	
 	if not EZPcfg.isVisible then EZP.ConfigFrame:Hide() end
+end
+
+-- workarround for the fact that temp. enchants are not loaded at the addon start
+function EZP:AddonStart()
+	EZP.Work.Time = EZP.Work.Time + arg1
+	if EZP.Work.Time >= 2 then
+		EZP.Work.Time = 0
+		EZP.ConfigFrame:SetScript("OnUpdate",nil)
+		EZP:UpdateTexture()
+	end
 end
 
 function EZP:ConfigFubar()
