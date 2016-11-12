@@ -32,22 +32,25 @@ EZP.Work = 	{
 		[1] = "Instant Poison",
 		[2] = "Deadly Poison",
 		[3] = "Crippling Poison",
-		[4] = "Mind-numbing Poison",
-		[5] = "Wound Poison",
+		[4] = "Crippling Poison II",
+		[5] = "Mind-numbing Poison",
+		[6] = "Wound Poison",
 	},
 	PoisonID = {
 		[1] = {6947,6949,6950,8926,8927,8928},
 		[2] = {2892,2893,8984,8985,20844},
-		[3] = {3775,3776},
-		[4] = {5237,6951,9186},
-		[5] = {10918,10920,10921,10922},
+		[3] = {3775},
+		[4] = {3776},
+		[5] = {5237,6951,9186},
+		[6] = {10918,10920,10921,10922},
 	},
 	PoisonIcon = {
 		[1] = "Interface\\Icons\\Ability_Poisons",
 		[2] = "Interface\\Icons\\Ability_Rogue_DualWeild",
-		[3] = "Interface\\Icons\\INV_Potion_19",
-		[4] = "Interface\\Icons\\Spell_Nature_NullifyDisease",
-		[5] = "Interface\\Icons\\Ability_PoisonSting",
+		[3] = "Interface\\Icons\\Ability_PoisonSting",
+		[4] = "Interface\\Icons\\INV_Potion_19",
+		[5] = "Interface\\Icons\\Spell_Nature_NullifyDisease",
+		[6] = "Interface\\Icons\\Ability_PoisonSting",
 	}
 }
 
@@ -134,7 +137,7 @@ function EZP.ConfigFrame:ConfigureUI()
 	self.ProfileButton:SetScript("OnLeave", function() for j=1,7 do self.ProfileButton[j]:Hide() end end)
 	
 	for i=1,7 do
-		if i == 1 then self.ProfileButton[i] = CreateFrame("Button", nil, self.ProfileButton); self.ProfileButton[i]:SetPoint("BOTTOM",self,"TOPLEFT", 11, 0)
+		if i == 1 then self.ProfileButton[i] = CreateFrame("Button", nil, self.ProfileButton); self.ProfileButton[i]:SetPoint("BOTTOM",self,"TOPLEFT", 11 , 0)
 		else self.ProfileButton[i] = CreateFrame("Button", nil, self.ProfileButton[i-1]); self.ProfileButton[i]:SetPoint("LEFT",self.ProfileButton[i-1],"RIGHT", 3, 0) end
 		self.ProfileButton[i]:SetID(i)
 		self.ProfileButton[i]:SetWidth(7)
@@ -155,7 +158,7 @@ function EZP.ConfigFrame:ConfigureUI()
 		info.isTitle = 1
 		UIDropDownMenu_AddButton(info)
 		info = {}
-		for i=1,5 do
+		for i=1,6 do
 			info.text = EZP.Work.Poison[i]
 			info.icon = EZP.Work.PoisonIcon[i]
 			info.checked = false
@@ -229,7 +232,7 @@ function EZP.ConfigFrame:ConfigureUI()
 		info.isTitle = 1
 		UIDropDownMenu_AddButton(info)
 		info = {}
-		for i=1,5 do
+		for i=1,6 do
 			info.text = EZP.Work.Poison[i]
 			info.checked = false
 			info.icon = EZP.Work.PoisonIcon[i]
@@ -300,7 +303,7 @@ function EZP.ConfigFrame:ConfigureUI()
 	self:SetScript("OnShow",function() EZPcfg.isVisible = 1 end)
 	self:SetScript("OnHide",function() EZPcfg.isVisible = nil end)
 	
-	if not EZPcfg.isVisible then self:Hide() end
+	if not EZPcfg.isVisible then EZP.ConfigFrame:Hide() end
 end
 
 function EZP:ConfigFubar()
@@ -552,7 +555,7 @@ function EZP:UpdateTexture()
 		for i=1,20 do
 			EZP.Parser:SetOwner(UIParent, "ANCHOR_NONE")
 			EZP.Work.ToolTipBuff = EZP.Parser:SetInventoryItem("player", 16)
-			if not EZP.Work.ToolTipBuff or not getglobal(EZP.Parser:GetName().."TextLeft"..i):GetText() or EZP.Work.ID > 5 or EZP.Work.ID < 1 then EZP.Parser:Hide(); EZP.ConfigFrame.MainHand:SetAlpha(0.2) break end
+			if not EZP.Work.ToolTipBuff or not getglobal(EZP.Parser:GetName().."TextLeft"..i):GetText() or EZP.Work.ID > 6 or EZP.Work.ID < 1 then EZP.Parser:Hide(); EZP.ConfigFrame.MainHand:SetAlpha(0.2) break end
 			if string.find(gsub(string.lower(getglobal(EZP.Parser:GetName().."TextLeft"..i):GetText()),"-",""),gsub(string.lower(EZP.Work.Poison[EZP.Work.ID]),"-","")) then
 				EZP.ConfigFrame.MainHand:SetAlpha(1)
 				break
@@ -567,7 +570,7 @@ function EZP:UpdateTexture()
 		for i=1,20 do
 			EZP.Parser:SetOwner(UIParent, "ANCHOR_NONE")
 			EZP.Work.ToolTipBuff = EZP.Parser:SetInventoryItem("player", 17)
-			if not EZP.Work.ToolTipBuff or not getglobal(EZP.Parser:GetName().."TextLeft"..i):GetText() or EZP.Work.ID > 5 or EZP.Work.ID < 1 then EZP.Parser:Hide(); EZP.ConfigFrame.OffHand:SetAlpha(0.2) break end
+			if not EZP.Work.ToolTipBuff or not getglobal(EZP.Parser:GetName().."TextLeft"..i):GetText() or EZP.Work.ID > 6 or EZP.Work.ID < 1 then EZP.Parser:Hide(); EZP.ConfigFrame.OffHand:SetAlpha(0.2) break end
 			if string.find(gsub(string.lower(getglobal(EZP.Parser:GetName().."TextLeft"..i):GetText()),"-",""),gsub(string.lower(EZP.Work.Poison[EZP.Work.ID]),"-","")) then
 				EZP.ConfigFrame.OffHand:SetAlpha(1)
 				break
@@ -590,7 +593,8 @@ function EZP:UpdatePoisonCount()
 		for i=0,4 do 
 			for j=1,18 do
 				if GetContainerItemInfo(i, j) then
-					if string.find(poisonName,gsub(string.lower(gsub(GetContainerItemLink(i,j),"^.*%[(.*)%].*$","%1")),"-","")) then
+					--if string.find(poisonName,gsub(string.lower(gsub(GetContainerItemLink(i,j),"^.*%[(.*)%].*$","%1")),"-","")) then
+					if poisonName == gsub(string.lower(gsub(GetContainerItemLink(i,j),"^.*%[(.*)%].*$","%1")),"-","") then
 						_, count = GetContainerItemInfo(i, j)
 						countPoison = countPoison + count
 					end
@@ -609,7 +613,8 @@ function EZP:UpdatePoisonCount()
 		for i=0,4 do 
 			for j=1,18 do
 				if GetContainerItemInfo(i, j) then
-					if string.find(poisonName,gsub(string.lower(gsub(GetContainerItemLink(i,j),"^.*%[(.*)%].*$","%1")),"-","")) then
+					--if string.find(poisonName,gsub(string.lower(gsub(GetContainerItemLink(i,j),"^.*%[(.*)%].*$","%1")),"-","")) then
+					if poisonName == gsub(string.lower(gsub(GetContainerItemLink(i,j),"^.*%[(.*)%].*$","%1")),"-","") then
 						_, count = GetContainerItemInfo(i, j)
 						countPoison = countPoison + count
 					end
@@ -626,10 +631,32 @@ function EZP:GetInventoryID(hand)
 		if hand == "MH" then H = UIDropDownMenu_GetSelectedID(EZP.ConfigFrame.MainHand.BorderDropdown)
 		elseif hand  == "OH" then H = UIDropDownMenu_GetSelectedID(EZP.ConfigFrame.OffHand.BorderDropdown) end
 		
+		-- if crippling poison 1
+		if H == 4 then
+			for i=0,4 do -- i = bagsnr.
+				for j=1,18 do -- j = slotnr.
+					if GetContainerItemInfo(i, j) and H <= 7 and H >= 2 then
+						if gsub(GetContainerItemLink(i,j),"^.*%[(.*)%].*$","%1") == EZP.Work.Poison[H-1] then return {i,j,"",EZP.Work.PoisonID[H-1][1],H-1} end
+					end
+				end
+			end
+		end
+		
+		-- if cripling poison 2
+		if H == 5 then
+			for i=0,4 do -- i = bagsnr.
+				for j=1,18 do -- j = slotnr.
+					if GetContainerItemInfo(i, j) and H <= 7 and H >= 2 then
+						if gsub(GetContainerItemLink(i,j),"^.*%[(.*)%].*$","%1") == EZP.Work.Poison[H-1].." II" then return {i,j,"",EZP.Work.PoisonID[H-1][1],H-1} end
+					end
+				end
+			end
+		end
+		
 		-- rank 6
 		for i=0,4 do -- i = bagsnr.
 			for j=1,18 do -- j = slotnr.
-				if GetContainerItemInfo(i, j) and H <= 6 and H >= 2 then
+				if GetContainerItemInfo(i, j) and H <= 7 and H >= 2 then
 					if gsub(GetContainerItemLink(i,j),"^.*%[(.*)%].*$","%1") == EZP.Work.Poison[H-1].." VI" then return {i,j," VI",EZP.Work.PoisonID[H-1][6],H-1} end
 				end
 			end
@@ -638,7 +665,7 @@ function EZP:GetInventoryID(hand)
 		-- rank 5
 		for i=0,4 do -- i = bagsnr.
 			for j=1,18 do -- j = slotnr.
-				if GetContainerItemInfo(i, j) and H <= 6 and H >= 2 then
+				if GetContainerItemInfo(i, j) and H <= 7 and H >= 2 then
 					if gsub(GetContainerItemLink(i,j),"^.*%[(.*)%].*$","%1") == EZP.Work.Poison[H-1].." V" then return {i,j," V",EZP.Work.PoisonID[H-1][5],H-1} end
 				end
 			end
@@ -647,7 +674,7 @@ function EZP:GetInventoryID(hand)
 		-- rank 4
 		for i=0,4 do -- i = bagsnr.
 			for j=1,18 do -- j = slotnr.
-				if GetContainerItemInfo(i, j) and H <= 6 and H >= 2 then
+				if GetContainerItemInfo(i, j) and H <= 7 and H >= 2 then
 					if gsub(GetContainerItemLink(i,j),"^.*%[(.*)%].*$","%1") == EZP.Work.Poison[H-1].." IV" then return {i,j," IV",EZP.Work.PoisonID[H-1][4],H-1} end
 				end
 			end
@@ -656,7 +683,7 @@ function EZP:GetInventoryID(hand)
 		-- rank 3
 		for i=0,4 do -- i = bagsnr.
 			for j=1,18 do -- j = slotnr.
-				if GetContainerItemInfo(i, j) and H <= 6 and H >= 2 then
+				if GetContainerItemInfo(i, j) and H <= 7 and H >= 2 then
 					if gsub(GetContainerItemLink(i,j),"^.*%[(.*)%].*$","%1") == EZP.Work.Poison[H-1].." III" then return {i,j," III",EZP.Work.PoisonID[H-1][3],H-1} end
 				end
 			end
@@ -665,7 +692,7 @@ function EZP:GetInventoryID(hand)
 		-- rank 2
 		for i=0,4 do -- i = bagsnr.
 			for j=1,18 do -- j = slotnr.
-				if GetContainerItemInfo(i, j) and H <= 6 and H >= 2 then
+				if GetContainerItemInfo(i, j) and H <= 7 and H >= 2 then
 					if gsub(GetContainerItemLink(i,j),"^.*%[(.*)%].*$","%1") == EZP.Work.Poison[H-1].." II" then return {i,j," II",EZP.Work.PoisonID[H-1][2],H-1} end
 				end
 			end
@@ -674,7 +701,7 @@ function EZP:GetInventoryID(hand)
 		-- rank 1
 		for i=0,4 do -- i = bagsnr.
 			for j=1,18 do -- j = slotnr.
-				if GetContainerItemInfo(i, j) and H <= 6 and H >= 2 then
+				if GetContainerItemInfo(i, j) and H <= 7 and H >= 2 then
 					if gsub(GetContainerItemLink(i,j),"^.*%[(.*)%].*$","%1") == EZP.Work.Poison[H-1] then return {i,j,"",EZP.Work.PoisonID[H-1][1],H-1} end
 				end
 			end
@@ -722,13 +749,13 @@ function EZP:SaveProfiles()
 	local MH = UIDropDownMenu_GetSelectedID(EZP.ConfigFrame.MainHand.BorderDropdown)
 	local OH = UIDropDownMenu_GetSelectedID(EZP.ConfigFrame.OffHand.BorderDropdown)
 	
-	if MH and MH <= 6 and MH >= 2 then
+	if MH and MH <= 7 and MH >= 2 then
 		EZPcfg.Profile[EZPcfg.CurrentProfile].MainHand = MH-1
 	else
 		EZPcfg.Profile[EZPcfg.CurrentProfile].MainHand = 0
 	end
 	
-	if OH and OH <= 6 and OH >= 2 then
+	if OH and OH <= 7 and OH >= 2 then
 		EZPcfg.Profile[EZPcfg.CurrentProfile].OffHand = OH-1
 	else
 		EZPcfg.Profile[EZPcfg.CurrentProfile].OffHand = 0
@@ -752,15 +779,13 @@ function EZP:UpdateSelection()
 	local MH = UIDropDownMenu_GetSelectedID(EZP.ConfigFrame.MainHand.BorderDropdown)
 	local OH = UIDropDownMenu_GetSelectedID(EZP.ConfigFrame.OffHand.BorderDropdown)
 	
-	if MH and MH <= 6 and MH >= 2 then
+	if MH and MH <= 7 and MH >= 2 then
 		EZP.ConfigFrame.MainHand:SetNormalTexture(EZP.Work.PoisonIcon[MH-1])
-		--getglobal("EZPMHButton".."IconTexture"):SetVertexColor(1, 1, 1,0.4)
-		--EZP.ConfigFrame.MainHand:SetBackdropColor(1, 1, 1,0.4) 
 	else
 		EZP.ConfigFrame.MainHand:SetNormalTexture("Interface\\Buttons\\UI-Quickslot-Depress")	
 	end
 	
-	if OH and OH <= 6 and OH >= 2 then
+	if OH and OH <= 7 and OH >= 2 then
 		EZP.ConfigFrame.OffHand:SetNormalTexture(EZP.Work.PoisonIcon[OH-1])	
 	else
 		EZP.ConfigFrame.OffHand:SetNormalTexture("Interface\\Buttons\\UI-Quickslot-Depress")
@@ -850,7 +875,7 @@ BuffFrame_Enchant_OnUpdate = EZP.BuffFrame_Enchant_OnUpdate
 function EzPoisonPromt(arg1)
 	if string.sub(arg1, 1, 5) == "scale" then
 		local scale = tonumber(string.sub(arg1, 6, string.len(arg1)))
-		if scale <=5 and scale >= 0.3 then EZPcfg.Scale = scale end
+		if scale <=3 and scale >= 0.3 then EZPcfg.Scale = scale end
 		EZP.ConfigFrame:SetScale(EZPcfg.Scale)
 		EZPcfg.PosX = 200
 		EZPcfg.PosY = -200
