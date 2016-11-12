@@ -125,10 +125,16 @@ function EZP.ConfigFrame:ConfigureUI()
 	self:RegisterForDrag("LeftButton")
 	self:SetScript("OnDragStart", EZP.ConfigFrame.StartMove)
 	self:SetScript("OnDragStop", EZP.ConfigFrame.StopMove)
-	self.ProfileButton = {}
+	
+	self.ProfileButton = CreateFrame("Button",nil,self)
+	self.ProfileButton:SetWidth(82)
+	self.ProfileButton:SetHeight(12)
+	self.ProfileButton:SetPoint("BOTTOM",self,"TOP",0,0)
+	self.ProfileButton:SetScript("OnEnter", function() for j=1,7 do self.ProfileButton[j]:Show() end end)
+	self.ProfileButton:SetScript("OnLeave", function() for j=1,7 do self.ProfileButton[j]:Hide() end end)
 	
 	for i=1,7 do
-		if i == 1 then self.ProfileButton[i] = CreateFrame("Button", nil, self); self.ProfileButton[i]:SetPoint("BOTTOM",self,"TOPLEFT", 10, 0)
+		if i == 1 then self.ProfileButton[i] = CreateFrame("Button", nil, self.ProfileButton); self.ProfileButton[i]:SetPoint("BOTTOM",self,"TOPLEFT", 11, 0)
 		else self.ProfileButton[i] = CreateFrame("Button", nil, self.ProfileButton[i-1]); self.ProfileButton[i]:SetPoint("LEFT",self.ProfileButton[i-1],"RIGHT", 3, 0) end
 		self.ProfileButton[i]:SetID(i)
 		self.ProfileButton[i]:SetWidth(7)
@@ -137,6 +143,9 @@ function EZP.ConfigFrame:ConfigureUI()
 			EZP:SetProfile(this:GetID())
 		end)
 		self.ProfileButton[i]:SetNormalTexture("Interface\\AddOns\\EzPoison\\Media\\buttonD")
+		self.ProfileButton[i]:SetScript("OnEnter", function() for j=1,7 do self.ProfileButton[j]:Show() end end)
+		self.ProfileButton[i]:SetScript("OnLeave", function() for j=1,7 do self.ProfileButton[j]:Hide() end end)
+		self.ProfileButton[i]:Hide()
 	end
 	
 	-- Mainhand
