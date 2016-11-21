@@ -646,7 +646,7 @@ function EZP:GetInventoryID(hand)
 			for i=0,4 do -- i = bagsnr.
 				for j=1,18 do -- j = slotnr.
 					if GetContainerItemInfo(i, j) and H <= 7 and H >= 2 then
-						if gsub(GetContainerItemLink(i,j),"^.*%[(.*)%].*$","%1") == EZP.Work.Poison[H-1] then return {i,j,"",EZP.Work.PoisonID[H-1][1],H-1} end
+						if gsub(GetContainerItemLink(i,j),"^.*%[(.*)%].*$","%1") == EZP.Work.Poison[H-1] then return {i,j,"",EZP.Work.PoisonID[3][1],H-1} end
 					end
 				end
 			end
@@ -657,7 +657,7 @@ function EZP:GetInventoryID(hand)
 			for i=0,4 do -- i = bagsnr.
 				for j=1,18 do -- j = slotnr.
 					if GetContainerItemInfo(i, j) and H <= 7 and H >= 2 then
-						if gsub(GetContainerItemLink(i,j),"^.*%[(.*)%].*$","%1") == EZP.Work.Poison[H-1].." II" then return {i,j,"",EZP.Work.PoisonID[H-1][1],H-1} end
+						if gsub(GetContainerItemLink(i,j),"^.*%[(.*)%].*$","%1") == EZP.Work.Poison[H-1].." II" then return {i,j,"",EZP.Work.PoisonID[4][1],H-1} end
 					end
 				end
 			end
