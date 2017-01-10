@@ -749,8 +749,7 @@ function EZP:AutoApplyPoison()
 	EZP:UpdateTexture()
 	if EZP.ConfigFrame.MainHand:GetAlpha() < 1 then
 		EZP:ApplyPoisen("MH")
-	end
-	if EZP.ConfigFrame.OffHand:GetAlpha() < 1 then
+	elseif EZP.ConfigFrame.OffHand:GetAlpha() < 1 then
 		EZP:ApplyPoisen("OH")
 	end
 end
